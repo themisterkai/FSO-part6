@@ -10,9 +10,7 @@ const AnecdoteForm = () => {
 
   const add = async event => {
     event.preventDefault();
-    const addedAnecdote = await anecdotesService.createNew(newAnecdote);
-    console.log(addedAnecdote);
-    dispatch(addAnecdote(addedAnecdote));
+    dispatch(addAnecdote(newAnecdote));
     dispatch(setNotification(`you added a new anecdode: '${addedAnecdote}'`));
   };
 
