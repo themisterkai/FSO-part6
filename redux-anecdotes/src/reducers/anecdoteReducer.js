@@ -1,5 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 import anecdotesService from '../services/anecdotes';
+import anecdotes from '../services/anecdotes';
 
 // const anecdotesAtStart = [
 //   'If it hurts, do it more often',
@@ -59,14 +60,8 @@ const anecdoteSlice = createSlice({
   initialState: [],
   reducers: {
     voteForAnecdote(state, action) {
-      const id = action.payload;
-      const anecdoteToChange = state.find(a => a.id === id);
-      const changedAnecdote = {
-        ...anecdoteToChange,
-        votes: anecdoteToChange.votes + 1,
-      };
       return state
-        .map(a => (a.id === id ? changedAnecdote : a))
+        .map(a => (a.id === action.payload.id ? action.payload : a))
         .sort((a, b) => b.votes - a.votes);
     },
     appendAnecdote(state, action) {
@@ -92,6 +87,17 @@ export const addAnecdote = anecdote => {
   return async dispatch => {
     const newAnecdote = await anecdotesService.createNew(anecdote);
     dispatch(appendAnecdote(newAnecdote));
+  };
+};
+
+export const vote = anecdote => {
+  return async dispatch => {
+    const changedAnecdote = await anecdotesService.update({
+      ...anecdote,
+      votes: anecdote.votes + 1,
+    });
+    console.log(changedAnecdote);
+    dispatch(voteForAnecdote(changedAnecdote));
   };
 };
 
