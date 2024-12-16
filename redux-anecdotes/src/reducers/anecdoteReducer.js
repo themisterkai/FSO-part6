@@ -96,7 +96,6 @@ export const vote = anecdote => {
       ...anecdote,
       votes: anecdote.votes + 1,
     });
-    console.log(changedAnecdote);
     dispatch(voteForAnecdote(changedAnecdote));
   };
 };
