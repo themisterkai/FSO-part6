@@ -1,4 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
+import anecdotesService from '../services/anecdotes';
+import anecdotes from '../services/anecdotes';
 
 // const anecdotesAtStart = [
 //   'If it hurts, do it more often',
@@ -18,8 +20,6 @@ import { createSlice } from '@reduxjs/toolkit';
 //     votes: 0,
 //   };
 // };
-
-
 
 // const anecdotesReducer = (state = initialState, action) => {
 //   console.log('state now: ', state);
@@ -60,19 +60,9 @@ const anecdoteSlice = createSlice({
   initialState: [],
   reducers: {
     voteForAnecdote(state, action) {
-      const id = action.payload;
-      const anecdoteToChange = state.find(a => a.id === id);
-      const changedAnecdote = {
-        ...anecdoteToChange,
-        votes: anecdoteToChange.votes + 1,
-      };
       return state
-        .map(a => (a.id === id ? changedAnecdote : a))
+        .map(a => (a.id === action.payload.id ? action.payload : a))
         .sort((a, b) => b.votes - a.votes);
-    },
-    addAnecdote(state, action) {
-      // const newAnecdote = asObject(action.payload);
-      state.push(action.payload);
     },
     appendAnecdote(state, action) {
       state.push(action.payload);
@@ -83,7 +73,32 @@ const anecdoteSlice = createSlice({
   },
 });
 
-export const { voteForAnecdote, addAnecdote, appendAnecdote, setAnedotes } =
+export const { voteForAnecdote, appendAnecdote, setAnedotes } =
   anecdoteSlice.actions;
+
+export const getAllAnecdotes = () => {
+  return async dispatch => {
+    const anecdotes = await anecdotesService.getAll();
+    dispatch(setAnedotes(anecdotes));
+  };
+};
+
+export const addAnecdote = anecdote => {
+  return async dispatch => {
+    const newAnecdote = await anecdotesService.createNew(anecdote);
+    dispatch(appendAnecdote(newAnecdote));
+  };
+};
+
+export const vote = anecdote => {
+  return async dispatch => {
+    const changedAnecdote = await anecdotesService.update({
+      ...anecdote,
+      votes: anecdote.votes + 1,
+    });
+    dispatch(voteForAnecdote(changedAnecdote));
+  };
+};
+
 
 export default anecdoteSlice.reducer;
