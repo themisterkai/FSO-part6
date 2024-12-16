@@ -26,6 +26,7 @@ const App = () => {
     queryKey: ['anecdotes'],
     queryFn: getAnecdotes,
     retry: 1,
+    select: anecdotes => anecdotes.sort((a, b) => b.votes - a.votes),
   });
 
   console.log(JSON.parse(JSON.stringify(result)));
